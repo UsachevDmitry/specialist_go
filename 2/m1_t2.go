@@ -13,6 +13,6 @@ func main() {
 	fmt.Scan(&c)
 	first := c/100
 	second := c%100/10
-	last := c%100%10
+	last := c%10
 	fmt.Printf("Наше число = %v , первая цифра = %v, вторая цифра = %v, последняя цифра = %v\n",c, first, second, last)
 }
