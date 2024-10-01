@@ -27,4 +27,53 @@ In: 5 5 5 5 5     Out: CONSTANT
 
 package main
 
-// Ваш код
+import (
+    "fmt"
+	"bufio"
+    "os"
+	"strings"
+	"strconv"
+)
+var (
+	str string
+	number [5]int64
+)
+
+func main() {
+	println("Введите последовательность из 5 целых чисел:")
+	str, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+	words := strings.Fields(str)	
+	for i , word := range words{
+		number[i], _ = strconv.ParseInt(string(word), 10, 64)
+	}
+
+	switch {
+	case number[0] == number[1] &&
+		 number[1] == number[2] &&
+		 number[2] == number[3] &&
+		 number[3] == number[4]:
+		fmt.Println("CONSTANT")
+	case number[0] < number[1] &&
+		 number[1] < number[2] &&
+		 number[2] < number[3] &&		 
+		 number[3] < number[4]:
+		fmt.Println("ASCENDING")
+	case (number[0] < number[1] || number[0] == number[1]) &&
+		 (number[1] < number[2] || number[1] == number[2]) &&
+		 (number[2] < number[3] || number[2] == number[3]) &&
+		 (number[3] < number[4] || number[3] == number[4]):
+	    fmt.Println("WEAKLY ASCENDING")		
+	case number[0] > number[1] &&
+		 number[1] > number[2] &&
+		 number[2] > number[3] &&
+		 number[3] > number[4]:
+		fmt.Println("DESCENDING")
+	case (number[0] > number[1] || number[0] == number[1]) &&
+		 (number[1] > number[2] || number[1] == number[2]) &&
+		 (number[2] > number[3] || number[2] == number[3]) &&
+		 (number[3] > number[4] || number[3] == number[4]):
+		fmt.Println("WEAKLY DESCENDING")
+	default:
+		fmt.Println("RANDOM")
+	}
+}
