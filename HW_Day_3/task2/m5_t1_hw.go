@@ -65,37 +65,39 @@ func main() {
 }
 
 // Проверка пароля на соответствие парольной политки
-func checkPassword(pass string) bool {
+func checkPassword(pass string) bool {	
 	status := 0
+	//проверка digits
 	if checkPasswordChars(pass, digits) {
 		status += 1
 	} else {
 		fmt.Println("В пароле нет цифр!")
 	}
-
+	//проверка lowercase
 	if checkPasswordChars(pass, lowercase) {
 		status += 1
 	} else {
 		fmt.Println("В пароле нет маленьких букв!")
 	}
-
+	//проверка uppercase
 	if checkPasswordChars(pass, uppercase) {
 		status += 1
 	} else {
 		fmt.Println("В пароле нет больших букв!")
 	}
-
+	//проверка special
 	if checkPasswordChars(pass, special) {
 		status += 1
 	} else {
 		fmt.Println("В пароле нет спец символов!")
 	}
+	//проверка len
 	if checkLenPassword(pass) {
 		status += 1
 	} else {
 		fmt.Println("Длина пароля должна быть от 8(мин) до 15(макс) символов")
 	}
-
+	// Проверка что пароль соответствует всем условиям
 	if status == 5 {
 		return true
 	} else {
