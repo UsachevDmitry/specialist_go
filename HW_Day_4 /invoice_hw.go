@@ -1,11 +1,11 @@
 /*
 Сформировать данные для отправки заказа из
 магазина по накладной и вывести на экран:
-1) Наименование товара (минимум 1, максимум 100) +
-2) Количество (только числа) +
-3) ФИО покупателя (только буквы) +
-4) Контактный телефон (10 цифр) +
-5) Адрес: индекс(ровно 6 цифр), город, улица, дом, квартира +
+1) Наименование товара (минимум 1, максимум 100) ++
+2) Количество (только числа) ++
+3) ФИО покупателя (только буквы) ++
+4) Контактный телефон (10 цифр) ++
+5) Адрес: индекс(ровно 6 цифр), город, улица, дом, квартира ++
 
 Эти данные не могут быть пустыми.
 Проверить правильность заполнения полей.
@@ -28,6 +28,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"regexp"
 )
 
 type Order struct {
@@ -36,13 +37,12 @@ type Order struct {
 }
 
 type Product struct {
-	name       string
-	count      int64
+	nameAndCount map[string]int64
 }
 
 type Buyer struct {
 	fullName   Fullname
-	phone 	   string
+	phone 	   int64
 	address    Address
 }
 
@@ -60,7 +60,6 @@ type Address struct {
 	flat  	   string
 }
 
-
 func main() {
 	ord := NewOrder()
 	fmt.Printf("Type: %T and value %v\n", ord, ord)
@@ -74,35 +73,74 @@ func NewOrder() *Order {
 }
 
 func NewProduct() *Product {
+	start: 
+	count := inputInt("Введите количество товаров планируемых к покупке, но не больше 100")
+	nameAndCount := make(map[string]int64)
+	if count > 0 && count <= 100 {
+		for i := 0; i < int(count); i++ {
+			nameAndCount[inputStr("Введите название товара")] = inputInt("Введите количество товара")
+		}
+	} else {
+		fmt.Println("Ошибка при вводе количества товара, введите количество товара заного")
+		goto start
+	}
 	return &Product{
-		name: inputStr("Введите название товара"),
-		count: inputInt("Введите количество товара"),
+		nameAndCount: nameAndCount,
 	}
 }
 
 func NewBuyer() *Buyer {
-	return &Buyer{
-		fullName: *NewFullname(),
-		phone: inputStr("Введите телефон"),
-		address: *NewAddress(),
+	start:
+	phone := inputInt("Введите телефон")
+    re := regexp.MustCompile(`^((\+7|7|8)+([0-9]){10})$`)
+	strphone := strconv.Itoa(int(phone))
+    match := re.MatchString(strphone)
+    if match {
+		return &Buyer{
+			fullName: *NewFullname(),
+			phone: phone,
+			address: *NewAddress(),
+		}
+    } else {
+        fmt.Println("Телефонный номер введен не корректно введите его заного")
+		goto start
 	}
 }
 
 func NewFullname() *Fullname {
-	return &Fullname{
-		firstName:  inputStr("Введите Имя"),
-		lastName:   inputStr("Введите Фамилию"),
-		patronymic: inputStr("Введите Отчество"),
+	start:
+	firstName := inputStr("Введите Имя")
+	lastName := inputStr("Введите Фамилию")
+	patronymic := inputStr("Введите Отчество")
+    re := regexp.MustCompile(`^[а-яА-ЯёЁa-zA-Z]+$`)
+    match := re.MatchString(firstName+lastName+patronymic)
+    if match {
+		return &Fullname{
+			firstName: firstName,
+			lastName: lastName,
+			patronymic: patronymic,
+		}
+    } else {
+        fmt.Println("ФИО содержит не только буквы, введите ФИО заного")
+		goto start
 	}
 }
 
 func NewAddress() *Address{
-	return &Address{
-		index:  inputInt("Введите Индекс"),
-		city:   inputStr("Введите Город"),
-		street: inputStr("Введите Улицу"),
-		house:	inputStr("Введите дом"),
-		flat:  	inputStr("Введите квартиру"),
+	start:
+	index := inputInt("Введите Индекс")
+	indexStr := strconv.Itoa(int(index))
+	if len(indexStr) == 6 {
+		return &Address{
+			index:  index,
+			city:   inputStr("Введите Город"),
+			street: inputStr("Введите Улицу"),
+			house:	inputStr("Введите дом"),
+			flat:  	inputStr("Введите квартиру"),
+		}
+    } else {
+        fmt.Println("Индекс введен не верпно должно быть 6 знаков введите индекс заного")
+		goto start
 	}
 }
 
@@ -117,6 +155,7 @@ func inputStr(text string) string {
 func inputInt(text string) int64 {
 	fmt.Println(text)
 	str, _ := bufio.NewReader(os.Stdin).ReadString('\n')
-	count, _ := strconv.ParseInt(strings.TrimSuffix(str, "\n"), 10, 64)
+	count, err := strconv.ParseInt(strings.TrimSuffix(str, "\n"), 10, 64)
+	if err != nil {fmt.Println("Можно вводить только цифры")}
 	return count
 }
