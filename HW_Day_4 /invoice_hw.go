@@ -62,6 +62,8 @@ type Address struct {
 
 func main() {
 	ord := NewOrder()
+	fmt.Println("Номер телефона из заказа:",ord.GetPhone())
+	fmt.Println("Город из заказа:",ord.GetCity())
 	fmt.Printf("Type: %T and value %v\n", ord, ord)
 }
 
@@ -114,14 +116,14 @@ func NewFullname() *Fullname {
 	patronymic := inputStr("Введите Отчество")
     re := regexp.MustCompile(`^[а-яА-ЯёЁa-zA-Z]+$`)
     match := re.MatchString(firstName+lastName+patronymic)
-    if match {
+    if match && firstName != "" && lastName != "" && patronymic != "" {
 		return &Fullname{
 			firstName: firstName,
 			lastName: lastName,
 			patronymic: patronymic,
 		}
     } else {
-        fmt.Println("ФИО содержит не только буквы, введите ФИО заного")
+        fmt.Println("ФИО содержит не только буквы или пусты, введите ФИО заного")
 		goto start
 	}
 }
@@ -139,11 +141,18 @@ func NewAddress() *Address{
 			flat:  	inputStr("Введите квартиру"),
 		}
     } else {
-        fmt.Println("Индекс введен не верпно должно быть 6 знаков введите индекс заного")
+        fmt.Println("Индекс введен не верпно должно быть 6 знаков, введите индекс заного")
 		goto start
 	}
 }
 
+func (o Order) GetPhone() int64 {
+	return o.buyer.phone
+}
+
+func (o Order) GetCity() string {
+	return o.buyer.address.city
+}
 
 func inputStr(text string) string {
 	fmt.Println(text)
@@ -153,9 +162,13 @@ func inputStr(text string) string {
 }
 
 func inputInt(text string) int64 {
+	start:
 	fmt.Println(text)
 	str, _ := bufio.NewReader(os.Stdin).ReadString('\n')
 	count, err := strconv.ParseInt(strings.TrimSuffix(str, "\n"), 10, 64)
-	if err != nil {fmt.Println("Можно вводить только цифры")}
+	if err != nil {
+		fmt.Println("Можно вводить только цифры") 
+		goto start
+	}
 	return count
 }
